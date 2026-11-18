@@ -725,7 +725,7 @@ songLimitTimer = setTimeout(() => {
 
   currentInstrumental = new Audio(randomMusic);
 
-  currentInstrumental.volume = 0.85;
+  currentInstrumental.volume = 0.90;
   currentInstrumental.loop = true;
 
   // Start instrumental immediately.
@@ -760,7 +760,7 @@ const matchingVoice = femaleVoice || voices.find(voice =>
 speech.lang = selectedLanguage;
 speech.rate = 1.08;
 speech.pitch = 1.4;
-speech.volume = 0.55;
+speech.volume = 0.40;
 
 if (matchingVoice) {
   speech.voice = matchingVoice;
