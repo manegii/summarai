@@ -1,0 +1,12 @@
+{
+  "name": "summarai",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler pages dev public"
+  },
+  "devDependencies": {
+    "wrangler": "^4.164.0"
+  }
+}

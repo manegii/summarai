@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SummarAI — AI Text Summariser</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #080b14;
+      --card: #101522;
+      --card-2: #151b2b;
+      --border: #252d40;
+      --text: #f4f7ff;
+      --muted: #8e98ad;
+      --primary: #7c5cff;
+      --primary-2: #9d86ff;
+      --green: #42e8a0;
+      --danger: #ff6b81;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(124, 92, 255, 0.18), transparent 35%),
+        radial-gradient(circle at 90% 20%, rgba(66, 232, 160, 0.08), transparent 30%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    button,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    .container {
+      width: min(1180px, calc(100% - 32px));
+      margin: auto;
+    }
+
+    /* NAVBAR */
+
+    nav {
+      height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-icon {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), #4e9cff);
+      box-shadow: 0 8px 25px rgba(124,92,255,.35);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 26px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav-links a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .nav-links a:hover {
+      color: white;
+    }
+
+    /* HERO */
+
+    .hero {
+      text-align: center;
+      padding: 75px 0 45px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 13px;
+      border: 1px solid rgba(124,92,255,.3);
+      background: rgba(124,92,255,.1);
+      color: #b7a8ff;
+      border-radius: 999px;
+      font-size: 13px;
+      margin-bottom: 22px;
+    }
+
+    .badge span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 12px var(--green);
+    }
+
+    h1 {
+      font-size: clamp(42px, 7vw, 76px);
+      line-height: .98;
+      letter-spacing: -4px;
+      max-width: 850px;
+      margin: auto;
+    }
+
+    h1 .gradient {
+      background: linear-gradient(90deg, #9c82ff, #6bb6ff, #55e9b0);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      max-width: 650px;
+      margin: 22px auto 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    /* APP */
+
+    .app {
+      margin: 30px auto 80px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .panel {
+      background: rgba(16,21,34,.82);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 25px 80px rgba(0,0,0,.2);
+      backdrop-filter: blur(15px);
+    }
+
+    .panel-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .panel-label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 390px;
+      resize: vertical;
+      min-height: 280px;
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 22px;
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+      text-align: left;
+    }
+
+    textarea::placeholder {
+      color: #596276;
+    }
+
+    .panel-footer {
+      padding: 14px 18px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .stats {
+      display: flex;
+      gap: 16px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    select {
+      background: var(--card-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 9px 12px;
+      outline: none;
+    }
+
+    .btn {
+      border: none;
+      cursor: pointer;
+      border-radius: 10px;
+      padding: 10px 16px;
+      color: white;
+      transition: .2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #5f8dff);
+      box-shadow: 0 8px 25px rgba(124,92,255,.25);
+    }
+
+    .btn-secondary {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+    }
+
+    .summary-content {
+      height: 390px;
+      padding: 24px 12px;
+      overflow-y: auto;
+      line-height: 1.8;
+      color: #dce3f2;
+      white-space: normal;
+      text-align: left !important;
+    }
+
+    .summary-text {
+      display: block;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      text-align: left !important;
+    }
+
+
+
+    .empty-state {
+      height: 100%;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: var(--muted);
+    }
+
+
+    .empty-icon {
+      width: 60px;
+      height: 60px;
+      margin: auto auto 15px;
+      border-radius: 17px;
+      display: grid;
+      place-items: center;
+      background: rgba(124,92,255,.12);
+      color: #a38fff;
+      font-size: 25px;
+    }
+
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .loading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+    }
+
+    .dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .dots span {
+      width: 6px;
+      height: 6px;
+      background: var(--primary-2);
+      border-radius: 50%;
+      animation: bounce .8s infinite alternate;
+    }
+
+    .dots span:nth-child(2) {
+      animation-delay: .15s;
+    }
+
+    .dots span:nth-child(3) {
+      animation-delay: .3s;
+    }
+
+    @keyframes bounce {
+      to {
+        transform: translateY(-5px);
+        opacity: .4;
+      }
+    }
+
+    /* FEATURES */
+
+    .features {
+      padding: 30px 0 100px;
+    }
+
+    .section-heading {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    .section-heading h2 {
+      font-size: 32px;
+      letter-spacing: -1px;
+    }
+
+    .section-heading p {
+      color: var(--muted);
+      margin-top: 9px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .feature {
+      padding: 25px;
+      border-radius: 18px;
+      background: rgba(16,21,34,.7);
+      border: 1px solid var(--border);
+    }
+
+    .feature-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: rgba(124,92,255,.12);
+      margin-bottom: 18px;
+    }
+
+    .feature h3 {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .feature p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 25px 0;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 800px) {
+      .nav-links {
+        display: none;
+      }
+
+      .hero {
+        padding-top: 50px;
+      }
+
+      h1 {
+        letter-spacing: -2px;
+      }
+
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      textarea,
+      .summary-content {
+        height: 330px;
+      }
+
+      .panel-footer {
+        flex-wrap: wrap;
+      }
+
+      .controls {
+        width: 100%;
+      }
+
+      .controls select,
+      .controls button {
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <nav>
+      <div class="logo">
+        <div class="logo-icon">✦</div>
+        SummarAI
+      </div>
+
+      <div class="nav-links">
+        <a href="#summariser">Summariser</a>
+        <a href="#features">Features</a>
+      </div>
+    </nav>
+
+    <main>
+
+      <section class="hero">
+        <div class="badge">
+          <span></span>
+          AI-powered text summarisation
+        </div>
+
+        <h1>
+          Turn long text into
+          <span class="gradient">clear ideas.</span>
+        </h1>
+
+        <p>
+          Paste an article, document, essay, or any block of text.
+          SummarAI extracts the key information and gives you a concise summary.
+        </p>
+      </section>
+
+      <section class="app" id="summariser">
+
+        <!-- INPUT -->
+
+        <div class="panel">
+
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Your text</div>
+              <div class="panel-label">Paste or type anything</div>
+            </div>
+
+            <button class="btn btn-secondary" onclick="clearText()">
+              Clear
+            </button>
+          </div>
+
+          <textarea
+            id="inputText"
+            placeholder="Paste your text here...
+
+For example:
+Artificial intelligence is transforming many industries by automating repetitive tasks, helping people analyse large amounts of information, and enabling new products and services..."
+            oninput="updateStats()"
+          ></textarea>
+
+          <p style="
+  padding: 0 22px 15px;
+  color: #8e98ad;
+  font-size: 12px;
+">
+  📄 Only PDF files are accepted. Maximum file size: 10 MB.
+</p>
+
+          <div class="panel-footer">
+
+            <div class="stats">
+              <span id="wordCount">0 words</span>
+              <span id="charCount">0 characters</span>
+            </div>
+
+            <div class="controls">
+
+              <select id="length">
+                <option value="short">Short summary</option>
+                <option value="medium" selected>Medium summary</option>
+                <option value="long">Detailed summary</option>
+              </select>
+
+              <button
+                class="btn btn-secondary"
+                onclick="document.getElementById('pdfInput').click()"
+              >
+                📄 PDF
+              </button>
+
+              <button
+                class="btn btn-primary"
+                onclick="summarise()"
+              >
+                ✨ Summarise
+              </button>
+
+            </div>
+
+            <input
+              id="pdfInput"
+              type="file"
+              accept="application/pdf"
+              hidden
+              onchange="uploadPDF()"
+            />
+
+          </div>
+
+        </div>
+
+        <!-- OUTPUT -->
+
+        <div class="panel">
+
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Summary</div>
+              <div class="panel-label">Your generated result</div>
+            </div>
+
+            <button
+              class="btn btn-secondary"
+              onclick="copySummary()"
+              id="copyBtn"
+            >
+              Copy
+            </button>
+          </div>
+
+          <div class="summary-content" id="summary">
+
+            <div class="empty-state">
+              <div>
+                <div class="empty-icon">✦</div>
+
+                <strong>Your summary will appear here</strong>
+
+                <p style="margin-top:7px">
+                  Add some text and click Summarise.
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="panel-footer">
+            <div class="stats">
+              <span id="summaryWords">0 words</span>
+              <span id="compression">—</span>
+            </div>
+            <select id="songLanguage">
+  <option value="en-US">🇬🇧 English</option>
+  <option value="id-ID">🇮🇩 Bahasa Indonesia</option>
+</select>
+            <button
+              class="btn btn-secondary"
+              onclick="makeSong()"
+              id="songBtn"
+            >
+              🎵 Turn Into Song
+            </button>
+
+            <span class="panel-label">
+              Generated locally
+            </span>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- FEATURES -->
+
+      <section class="features" id="features">
+
+        <div class="section-heading">
+          <h2>Everything you need to summarise</h2>
+          <p>Simple, fast, and designed for focused reading.</p>
+        </div>
+
+        <div class="feature-grid">
+
+          <div class="feature">
+            <div class="feature-icon">⚡</div>
+            <h3>Instant summaries</h3>
+            <p>
+              Quickly turn lengthy text into a concise version
+              containing the most important information.
+            </p>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon">◎</div>
+            <h3>Adjustable length</h3>
+            <p>
+              Choose between short, medium, and detailed summaries
+              depending on how much information you need.
+            </p>
+          </div>
+
+          <div class="feature">
+            <div class="feature-icon">🔒</div>
+            <h3>Private by default</h3>
+            <p>
+              This demo performs summarisation directly in your browser,
+              so there is no server required.
+            </p>
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+    <footer>
+      © 2026 SummarAI · Built for focused reading
+    </footer>
+
+  </div>
+
+
+  <script>
+    
+    const input = document.getElementById("inputText");
+const summary = document.getElementById("summary");
+let hasGeneratedSummary = false;
+
+function getWords(text) {
+  return text
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
+
+
+let songPlaying = false;
+let currentInstrumental = null;
+let songTimer = null;
+let songLimitTimer = null;
+
+function makeSong() {
+
+  const text = summary.innerText.trim();
+
+  if (!hasGeneratedSummary || !text) {
+  showError("Please generate a summary before playing the song.");
+  return;
+}
+
+  // If already playing, stop everything.
+  if (songPlaying) {
+    stopSong();
+    return;
+  }
+
+  const button = document.getElementById("songBtn");
+  const selectedLanguage =
+  document.getElementById("songLanguage").value;
+
+  songPlaying = true;
+  button.textContent = "⏹ Stop Song";
+// Automatically stop the entire song after 30 seconds.
+songLimitTimer = setTimeout(() => {
+  stopSong();
+}, 30000);
+  // Random instrumental selection.
+  const instrumentals = [
+    "/music/instrumental1.mp3",
+    "/music/instrumental2.mp3",
+    "/music/instrumental3.mp3"
+  ];
+
+  const randomMusic =
+    instrumentals[Math.floor(Math.random() * instrumentals.length)];
+
+  currentInstrumental = new Audio(randomMusic);
+
+  currentInstrumental.volume = 0.3;
+  currentInstrumental.loop = true;
+
+  // Start instrumental immediately.
+  currentInstrumental.play().catch(error => {
+    console.error("Music playback error:", error);
+    stopSong();
+    showError("Unable to play instrumental audio.");
+  });
+
+  // Start text-to-speech after 4 seconds.
+  songTimer = setTimeout(() => {
+
+    if (!songPlaying) return;
+
+    const speech = new SpeechSynthesisUtterance(text);
+
+    const voices = speechSynthesis.getVoices();
+
+const femaleVoice = voices.find(voice =>
+  voice.lang.toLowerCase().startsWith(
+    selectedLanguage === "id-ID" ? "id" : "en"
+  ) &&
+  /female|woman|serena|susan|hazel/i.test(voice.name)
+);
+
+const matchingVoice = femaleVoice || voices.find(voice =>
+  voice.lang.toLowerCase().startsWith(
+    selectedLanguage === "id-ID" ? "id" : "en"
+  )
+);
+
+speech.lang = selectedLanguage;
+speech.rate = 1.08;
+speech.pitch = 1.5;
+speech.volume = 0.9;
+
+if (matchingVoice) {
+  speech.voice = matchingVoice;
+}
+    speech.onend = () => {
+      stopSong();
+    };
+
+    speech.onerror = () => {
+      stopSong();
+    };
+
+    speechSynthesis.speak(speech);
+
+  }, 4000);
+}
+
+function stopSong() {
+
+  songPlaying = false;
+
+  clearTimeout(songLimitTimer);
+songLimitTimer = null;
+
+  window.speechSynthesis.cancel();
+
+  if (currentInstrumental) {
+    currentInstrumental.pause();
+    currentInstrumental.currentTime = 0;
+    currentInstrumental = null;
+  }
+
+  const button = document.getElementById("songBtn");
+
+  button.disabled = false;
+  button.textContent = "🎵 Turn Into Song";
+}
+
+
+function updateStats() {
+
+  hasGeneratedSummary = false;
+
+if (songPlaying) {
+  stopSong();
+}
+
+document.getElementById("songBtn").disabled = true;
+
+  const text = input.value;
+  const words = getWords(text);
+
+  document.getElementById("wordCount").textContent =
+    `${words.length} words`;
+
+  document.getElementById("charCount").textContent =
+    `${text.length} characters`;
+}
+
+
+function showLoading(message = "Generating your summary...") {
+
+  summary.innerHTML = `
+    <div class="empty-state">
+      <div class="loading">
+        <div class="dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        ${message}
+      </div>
+    </div>
+  `;
+}
+
+
+function showError(message) {
+
+  summary.innerHTML = `
+    <div class="empty-state">
+      <div>
+        <div class="empty-icon">!</div>
+
+        <strong>${escapeHTML(message)}</strong>
+
+        <p style="margin-top:7px">
+          Please try again.
+        </p>
+      </div>
+    </div>
+  `;
+}
+
+
+async function summarise() {
+
+  const text = input.value.trim();
+
+  if (!text) {
+    input.focus();
+    showError("Please enter some text first.");
+    return;
+  }
+
+  showLoading();
+
+  try {
+
+    const length =
+      document.getElementById("length").value;
+
+    const response = await fetch("/api/summarize", {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        text,
+        length,
+        language: document.getElementById("songLanguage").value
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Unable to summarize.");
+    }
+
+    displaySummary(data.summary, text);
+
+  } catch (error) {
+
+    showError(
+  error.message || "Failed to generate summary. Please try again."
+);
+
+  }
+}
+
+
+
+async function uploadPDF() {
+
+  const file = document.getElementById("pdfInput").files[0];
+
+  if (!file) return;
+
+  const isPDF =
+    file.type === "application/pdf" ||
+    file.name.toLowerCase().endsWith(".pdf");
+
+  if (!isPDF) {
+    showError("Invalid file type! Only PDF files are accepted.");
+    document.getElementById("pdfInput").value = "";
+    return;
+  }
+
+  if (file.size > 10 * 1024 * 1024) {
+    showError("File too large! PDF must be smaller than 10 MB.");
+    document.getElementById("pdfInput").value = "";
+    return;
+  }
+
+  showLoading("Reading your PDF...");
+
+  try {
+
+    // Load PDF.js directly in the browser.
+    const pdfjsLib = await import(
+      "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs"
+    );
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
+
+    // Read the selected PDF.
+    const arrayBuffer = await file.arrayBuffer();
+
+    const pdf = await pdfjsLib.getDocument({
+      data: new Uint8Array(arrayBuffer)
+    }).promise;
+
+    if (pdf.numPages > 100) {
+      throw new Error("PDF cannot contain more than 100 pages.");
+    }
+
+    // Extract text from every page.
+    let extractedText = "";
+
+    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+
+      const page = await pdf.getPage(pageNumber);
+
+      const content = await page.getTextContent();
+
+      const pageText = content.items
+        .map(item => item.str || "")
+        .join(" ");
+
+      extractedText += pageText + "\n\n";
+    }
+
+    extractedText = extractedText.trim();
+
+    if (!extractedText) {
+      throw new Error(
+        "This PDF does not contain readable text. Scanned PDFs require OCR."
+      );
+    }
+
+    if (extractedText.length > 100000) {
+      throw new Error(
+        "PDF text is too long. Please use a shorter document."
+      );
+    }
+
+    showLoading("Generating your PDF summary...");
+
+    // Send extracted text to the existing Groq API.
+    const response = await fetch("/api/summarize", {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+
+        text: extractedText,
+
+        length: document.getElementById("length").value,
+
+        language: document.getElementById("songLanguage").value
+
+      })
+
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Unable to summarize PDF.");
+    }
+
+    // Display the result.
+    displaySummary(data.summary, extractedText);
+
+    document.getElementById("wordCount").textContent =
+      `${getWords(extractedText).length} words`;
+
+    document.getElementById("charCount").textContent =
+      `${pdf.numPages} pages`;
+
+  } catch (error) {
+
+    console.error("PDF processing error:", error);
+
+    showError(
+      error.message || "Failed to process PDF. Please try again."
+    );
+
+  } finally {
+
+    document.getElementById("pdfInput").value = "";
+
+  }
+}
+
+
+
+function displaySummary(result, originalText = "") {
+hasGeneratedSummary = true;
+
+document.getElementById("songBtn").disabled = false;
+  summary.innerHTML = `
+    <div class="summary-text">
+      ${escapeHTML(result)}
+    </div>
+  `;
+
+  const resultWords =
+    getWords(result).length;
+
+  document.getElementById("summaryWords").textContent =
+    `${resultWords} words`;
+
+  if (originalText) {
+
+    const originalWords =
+      getWords(originalText).length;
+
+    const percentage = originalWords
+      ? Math.round(
+          (1 - resultWords / originalWords) * 100
+        )
+      : 0;
+
+    document.getElementById("compression").textContent =
+      `${Math.max(0, percentage)}% shorter`;
+
+  } else {
+
+    document.getElementById("compression").textContent =
+      "AI generated";
+
+  }
+}
+
+
+function clearText() {
+hasGeneratedSummary = false;
+
+if (songPlaying) {
+  stopSong();
+}
+
+document.getElementById("songBtn").disabled = true;
+  input.value = "";
+
+  summary.innerHTML = `
+    <div class="empty-state">
+      <div>
+        <div class="empty-icon">✦</div>
+
+        <strong>Your summary will appear here</strong>
+
+        <p style="margin-top:7px">
+          Add some text and click Summarise.
+        </p>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("summaryWords").textContent =
+    "0 words";
+
+  document.getElementById("compression").textContent =
+    "—";
+
+  updateStats();
+}
+
+
+async function copySummary() {
+
+  const text =
+    summary.innerText.trim();
+
+  if (!text) {
+    return;
+  }
+
+  try {
+
+    await navigator.clipboard.writeText(text);
+
+    const button =
+      document.getElementById("copyBtn");
+
+    button.textContent = "Copied ✓";
+
+    setTimeout(() => {
+      button.textContent = "Copy";
+    }, 1500);
+
+  } catch {
+    alert("Unable to copy the summary.");
+  }
+}
+
+
+function escapeHTML(text) {
+
+  const div =
+    document.createElement("div");
+
+  div.textContent = text;
+
+  return div.innerHTML;
+}
+
+  </script>
+
+</body>
+</html>
